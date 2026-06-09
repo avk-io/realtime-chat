@@ -3,6 +3,9 @@ import { redis } from "./lib/redis"
 import { nanoid } from "nanoid"
 
 export const proxy = async (req: NextRequest) => {
+  // ignore Next.js RSC requests
+  if (req.nextUrl.searchParams.has("_rsc")) return NextResponse.next()
+
   const pathname = req.nextUrl.pathname
 
   const roomMatch = pathname.match(/^\/room\/([^/]+)$/)
@@ -20,18 +23,15 @@ export const proxy = async (req: NextRequest) => {
 
   const existingToken = req.cookies.get("x-auth-token")?.value
 
-  // USER IS ALLOWED TO JOIN ROOM
   if (existingToken && meta.connected.includes(existingToken)) {
     return NextResponse.next()
   }
 
-  // USER IS NOT ALLOWED TO JOIN
   if (meta.connected.length >= 2) {
     return NextResponse.redirect(new URL("/?error=room-full", req.url))
   }
 
   const response = NextResponse.next()
-
   const token = nanoid()
 
   response.cookies.set("x-auth-token", token, {
