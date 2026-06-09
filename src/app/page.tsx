@@ -26,7 +26,7 @@ function Lobby() {
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {
-      const res = await client.room.create.post()
+      const res = await client.api.room.create.post()
 
       if (res.status === 200) {
         router.push(`/room/${res.data?.roomId}`)
