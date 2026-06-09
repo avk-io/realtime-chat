@@ -3,19 +3,11 @@ import { redis } from "./lib/redis"
 import { nanoid } from "nanoid"
 
 export const proxy = async (req: NextRequest) => {
-  // ignore Next.js RSC requests
-  if (req.nextUrl.searchParams.has("_rsc")) {
-    return NextResponse.next()
-  }
-
-  export const proxy = async (req: NextRequest) => {
   if (req.nextUrl.searchParams.has("_rsc")) return NextResponse.next()
 
-  // ignore link preview bots
   const ua = req.headers.get("user-agent") ?? ""
   const isBot = /whatsapp|telegram|twitterbot|facebookexternalhit|linkedinbot|slackbot|discordbot|preview|crawler|bot/i.test(ua)
   if (isBot) return NextResponse.next()
-
 
   const pathname = req.nextUrl.pathname
 
