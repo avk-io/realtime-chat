@@ -8,11 +8,16 @@ export const proxy = async (req: NextRequest) => {
     return NextResponse.next()
   }
 
+  export const proxy = async (req: NextRequest) => {
+  if (req.nextUrl.searchParams.has("_rsc")) return NextResponse.next()
+
+  // ignore link preview bots
+  const ua = req.headers.get("user-agent") ?? ""
+  const isBot = /whatsapp|telegram|twitterbot|facebookexternalhit|linkedinbot|slackbot|discordbot|preview|crawler|bot/i.test(ua)
+  if (isBot) return NextResponse.next()
 
 
   const pathname = req.nextUrl.pathname
-  console.log("PROXY HIT - url:", req.nextUrl.href)
-
 
   const roomMatch = pathname.match(/^\/room\/([^/]+)$/)
   if (!roomMatch) return NextResponse.redirect(new URL("/", req.url))
@@ -22,8 +27,6 @@ export const proxy = async (req: NextRequest) => {
   const meta = await redis.hgetall<{ connected: string[]; createdAt: number }>(
     `meta:${roomId}`
   )
-console.log("PROXY - connected before:", meta?.connected?.length)
-
 
   if (!meta) {
     return NextResponse.redirect(new URL("/?error=room-not-found", req.url))
