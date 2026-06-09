@@ -4,9 +4,15 @@ import { nanoid } from "nanoid"
 
 export const proxy = async (req: NextRequest) => {
   // ignore Next.js RSC requests
-  if (req.nextUrl.searchParams.has("_rsc")) return NextResponse.next()
+  if (req.nextUrl.searchParams.has("_rsc")) {
+    return NextResponse.next()
+  }
+
+
 
   const pathname = req.nextUrl.pathname
+  console.log("PROXY HIT - url:", req.nextUrl.href)
+
 
   const roomMatch = pathname.match(/^\/room\/([^/]+)$/)
   if (!roomMatch) return NextResponse.redirect(new URL("/", req.url))
@@ -16,6 +22,8 @@ export const proxy = async (req: NextRequest) => {
   const meta = await redis.hgetall<{ connected: string[]; createdAt: number }>(
     `meta:${roomId}`
   )
+console.log("PROXY - connected before:", meta?.connected?.length)
+
 
   if (!meta) {
     return NextResponse.redirect(new URL("/?error=room-not-found", req.url))
