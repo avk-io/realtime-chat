@@ -8,6 +8,7 @@ export const proxy = async (req: NextRequest) => {
   const ua = req.headers.get("user-agent") ?? ""
   const isBot = /whatsapp|telegram|twitterbot|facebookexternalhit|linkedinbot|slackbot|discordbot|preview|crawler|bot/i.test(ua)
   if (isBot) return NextResponse.next()
+    console.log("UA:", req.headers.get("user-agent"))
 
   const pathname = req.nextUrl.pathname
 
