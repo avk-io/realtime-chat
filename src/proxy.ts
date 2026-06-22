@@ -6,10 +6,8 @@ export const proxy = async (req: NextRequest) => {
   if (req.nextUrl.searchParams.has("_rsc")) return NextResponse.next()
 
   const ua = req.headers.get("user-agent") ?? ""
-  console.log("UA:", ua)
   const isBot = /whatsapp|telegram|twitterbot|facebookexternalhit|linkedinbot|slackbot|discordbot|preview|crawler|bot/i.test(ua)
   if (isBot){
-    console.log("Blocked as bot")
      return NextResponse.next()
 }
 
